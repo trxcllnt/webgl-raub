@@ -49,6 +49,11 @@ const enforceBool = x => typeof x === 'boolean' ? (x ? 1 : 0) : x;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+const _clear = gl.clear;
+gl.clear = (mask) => {
+    gl._clearMask |= mask;
+    return _clear(mask);
+};
 
 // Attrib
 
