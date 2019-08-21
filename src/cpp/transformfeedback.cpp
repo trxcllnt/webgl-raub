@@ -82,22 +82,19 @@ JS_METHOD(transformFeedbackVaryings) { NAPI_ENV;
 	REQ_ARRAY_ARG(1, jsVaryings);
 	REQ_INT32_ARG(2, bufferMode);
 	
-	std::vector<char*> cppVaryings;
-	
 	uint32_t count = jsVaryings.Length();
+	std::string *cppVaryings = new std::string [count];
+	const char **varyings = new const char* [count];
 	
 	for (uint32_t i = 0; i < count; i++) {
-		std::string varying = jsVaryings.Get(i).As<Napi::String>().Utf8Value();
-		char* str = static_cast<char*>(malloc(varying.length() + 1));
-		varying.copy(str, varying.length(), 0);
-		cppVaryings.push_back(str);
+		cppVaryings[i] = jsVaryings.Get(i).As<Napi::String>().Utf8Value();
+		varyings[i] = cppVaryings[i].c_str();
 	}
-    
-	glTransformFeedbackVaryings(program, count, cppVaryings.data(), bufferMode);
 	
-	for (uint32_t i = 0; i < count; i++) {
-		free(cppVaryings[i]);
-	}
+	glTransformFeedbackVaryings(program, count, varyings, bufferMode);
+	
+	delete [] varyings;
+	delete [] cppVaryings;
 	
 	RET_UNDEFINED;
 	
